@@ -1,0 +1,67 @@
+Entries[123] (.csv)
+    PostID: Identifier of the entry, assigned by Friendfeed.
+    PostedBy: Identifier of the author of the post.
+    SourceName: If present, external source of the entry, e.g., Twitter or Facebook.
+    SourceURL: address of the source of the post.
+    GeoX: empty field.
+    GeoY: empty field.
+    Timestamp: Timestamp of posting, GMT+1.
+    Text: Body of the message.
+    NumImg: number of images.
+    ImgURL: URLs of images.
+    NumImg: number of videos.
+    ImgURL: URLs of videos.
+
+
+
+Entries 1:
+
+['Twitter'] : 798886
+['Ping.fm'] : 580099
+['Google Reader'] : 293753
+['Bookmarklet'] : 119210
+['delicious'] : 87839
+['HelloTxt'] : 86584
+['Tumblr'] : 45436
+['identi.ca'] : 38531
+['Flickr'] : 30451
+['Blip.fm'] : 30124
+
+
+Entries 2:
+
+['Twitter'] : 1270500
+['Ping.fm'] : 587708
+['Google Reader'] : 275519
+['Bookmarklet'] : 129518
+['delicious'] : 60089
+['identi.ca'] : 34198
+['HelloTxt'] : 32960
+['email'] : 30231
+['Posterous'] : 29432
+['Tumblr'] : 24342
+
+
+
+Entries 3:
+
+['Twitter'] : 1332490
+['Ping.fm'] : 748967
+['Google Reader'] : 292830
+['Bookmarklet'] : 120256
+['email'] : 119189
+['HelloTxt'] : 48233
+['delicious'] : 38405
+['Posterous'] : 35564
+['identi.ca'] : 24796
+['LiveJournal'] : 20298
+['Tumblr'] : 19525
+['Blip.fm'] : 18198
+['Mashable!'] : 13663
+['Flickr'] : 11370
+['YouTube'] : 9057
+['brightkite.com'] : 6836
+['ReadWriteWeb'] : 6595
+['Ameba'] : 5263
+['TechCrunch'] : 5073
+['Amplify'] : 4935
