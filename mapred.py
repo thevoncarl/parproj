@@ -42,12 +42,17 @@ def Map(L):
             spamreader = csv.reader(row, delimiter=';')
             for l in spamreader:
                 arr.append(str(l))
+
+            #if arr[2] != '[]' and len(arr[2]) < 20:
+            #  results.append((arr[2],1))
+              
+            
             if arr[2] == "['Twitter']": #arr[2] != "[]" and  len(arr[2]) < 20:
               for word in arr[7].split():
                 if word.isalpha():
                   if word in nouns:
                     results.append((word,1))
-           
+            
             
     return results
 
@@ -92,7 +97,7 @@ if __name__ == '__main__':
  
   print "map now"
   # Generate count tuples for title-cased tokens
-  lists = ['./Tweets/e11','./Tweets/e12','./Tweets/e13','./Tweets/e14','./Tweets/e21','./Tweets/e22','./Tweets/e23','./Tweets/e24']
+  lists = ['./Tweets/e11','./Tweets/e12','./Tweets/e13','./Tweets/e14','./Tweets/e21','./Tweets/e22','./Tweets/e23','./Tweets/e24', './Tweets/e31','./Tweets/e32','./Tweets/e33','./Tweets/e34','./Tweets/e35']
   #lists = ['entries1.csv','entries2.csv','entries3.csv']
   single_count_tuples = pool.map(Map, lists)
   
