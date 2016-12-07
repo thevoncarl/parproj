@@ -3,12 +3,10 @@ from multiprocessing import Pool
 import csv
 import time
 import re
-import nltk
-from nltk.corpus import wordnet as wn
-from nltk.corpus.reader import NOUN
+from sets import Set
+from functools import partial
 
-
-nouns = {x.name().split('.', 1)[0] for x in wn.all_synsets('v')}
+  
 """
 Sort tuples by term frequency, and then alphabetically.
 """
@@ -21,38 +19,41 @@ def tuple_sort (a, b):
   else:
     return cmp(a[0], b[0])
 
+"""
+Find all files in a directory and returns to path to each one of them
+"""
+
+def findFiles(directory):
+  from os import listdir
+  from os.path import isfile, join
+  files = [directory + f for f in listdir(directory) if isfile(join(directory, f))]
+  return files
   
 """
-Given a list of tokens, return a list of tuples of
-titlecased (or proper noun) tokens and a count of '1'.
-Also remove any leading or trailing punctuation from
-each token.
+Find occurences of words in entry text that occurs in our wordList
+
 """
 
 
-def Map(L):
- 
+def Map(dataset,org,fileName):
     results = []
-    with open(L,'rU') as csvfile:
+    with open(fileName,'rU') as csvfile:
         spamreader = csv.reader(csvfile, delimiter='\t')
-        i = 0
         for row in spamreader:
             
             arr = []
             spamreader = csv.reader(row, delimiter=';')
             for l in spamreader:
                 arr.append(str(l))
-
-            #if arr[2] != '[]' and len(arr[2]) < 20:
-            #  results.append((arr[2],1))
-              
+            company = (arr[2])[2:-2] #arr[2] is where the post originates from 
             
-            if arr[2] == "['Twitter']": #arr[2] != "[]" and  len(arr[2]) < 20:
-              for word in arr[7].split():
+            if company  == org: 
+              for word in arr[7].split(): #arr[7] is corresponding to the text contained in the post
+                #Simple word processing
                 if word.isalpha():
-                  if word in nouns:
-                    results.append((word,1))
-            
+                  if str(word).lower() in dataset:
+                    results.append((word.lower(),1))
+              
             
     return results
 
@@ -81,39 +82,56 @@ number for this token, and return a final tuple (token, frequency).
 def Reduce(Mapping):
   return (Mapping[0], sum(pair[1] for pair in Mapping[1]))
 
+"""
+Based on a file with words for each line, create a dictionary
+"""
 
+def createWordList(fileName):
+
+  dataset = Set()
+  with open(fileName,'r') as words:
+    for line in words:
+      for word in line.split():
+        dataset.add(word.lower())
+  return dataset
 
 if __name__ == '__main__':
-
   
-  if (len(sys.argv) != 2):
-    print "Program requires path to file for reading!"
+  if (len(sys.argv) != 4):
+    print "Usage: python mapred.py [Input directory] [Path to wordlist file] [Name of company to find post from] \nExample: python mapred.py \'Input/\' \'sports\' \'Twitter\'"
     sys.exit(1)
+
+  inDir = sys.argv[1]
+  wordDir = sys.argv[2]
+  orgName = sys.argv[3]
+  
   start = time.time()
   
   pool = Pool(processes=4,)
  
-  # Fragment the string data into 8 chunks
  
-  print "map now"
-  # Generate count tuples for title-cased tokens
-  lists = ['./Tweets/e11','./Tweets/e12','./Tweets/e13','./Tweets/e14','./Tweets/e21','./Tweets/e22','./Tweets/e23','./Tweets/e24', './Tweets/e31','./Tweets/e32','./Tweets/e33','./Tweets/e34','./Tweets/e35']
-  #lists = ['entries1.csv','entries2.csv','entries3.csv']
-  single_count_tuples = pool.map(Map, lists)
-  
+  dataset = createWordList(wordDir)
+  print "Starting map..."
 
-  print "partition now"
+  files = findFiles(inDir)
+
+  single_count_tuples = pool.map(partial(Map, dataset,orgName),files)
+  
+  
+  print "Starting Partition..."
+  
   # Organize the count tuples; lists of tuples by token key
   token_to_tuples = Partition(single_count_tuples)
-  print "reduce now"
+  
+  print "Starting Reduce..."
   # Collapse the lists of tuples into total term frequencies
   
   term_frequencies = pool.map(Reduce, token_to_tuples.items())
-  print "sort now"
-  # Sort the term frequencies in nonincreasing order
 
   
-  
+  print "Sorting list..."
+  # Sort the term frequencies in nonincreasing order
+   
   term_frequencies.sort (tuple_sort)
  
   for pair in term_frequencies[:20]:
