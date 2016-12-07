@@ -30,11 +30,9 @@ def findFiles(directory):
   return files
   
 """
-Find occurences of words in entry text that occurs in our wordList
+Find occurences of words in for every entry text that occurs in our wordList
 
 """
-
-
 def Map(dataset,org,fileName):
     results = []
     with open(fileName,'rU') as csvfile:
@@ -83,9 +81,8 @@ def Reduce(Mapping):
   return (Mapping[0], sum(pair[1] for pair in Mapping[1]))
 
 """
-Based on a file with words for each line, create a dictionary
+Based on a file with words for each line, create and return a dictionary
 """
-
 def createWordList(fileName):
 
   dataset = Set()
@@ -95,19 +92,20 @@ def createWordList(fileName):
         dataset.add(word.lower())
   return dataset
 
+
 if __name__ == '__main__':
   
-  if (len(sys.argv) != 4):
-    print "Usage: python mapred.py [Input directory] [Path to wordlist file] [Name of company to find post from] \nExample: python mapred.py \'Input/\' \'sports\' \'Twitter\'"
+  if (len(sys.argv) != 5):
+    print "Usage: python mapred.py [Input directory] [Path to wordlist file] [Name of company to find post from] [Nr of threads for map & reduce] \nExample: python mapred.py \'Input/\' \'sports\' \'Twitter\' 4"
     sys.exit(1)
 
   inDir = sys.argv[1]
   wordDir = sys.argv[2]
   orgName = sys.argv[3]
-  
+  procc = int(sys.argv[4])
   start = time.time()
   
-  pool = Pool(processes=4,)
+  pool = Pool(processes=procc,)
  
  
   dataset = createWordList(wordDir)
