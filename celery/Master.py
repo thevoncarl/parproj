@@ -31,10 +31,7 @@ def tuple_sort (a, b):
 
 
 '''
-Group the sublists of (token, 1) pairs into a term-frequency-list
-map, so that the Reduce operation later can work on sorted
-term counts. The returned result is a dictionary with the structure
-{token : [(token, 1), ...] .. }
+Combine tuples with the same key.
 '''
 def Partition(L):
     tf = {}
@@ -47,11 +44,9 @@ def Partition(L):
                 tf[p[0]] = [p]
     return tf
 
-"""
-Given a (token, [(token, 1) ...]) tuple, collapse all the
-count tuples from the Map operation into a single term frequency
-number for this token, and return a final tuple (token, frequency).
-"""
+'''
+Count the number of occurences for each (key,value) tuple
+'''
 def Reduce(Mapping):
   return (Mapping[0], sum(pair[1] for pair in Mapping[1]))
 

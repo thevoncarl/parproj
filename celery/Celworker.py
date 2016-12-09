@@ -6,6 +6,7 @@ import re
 from sets import Set
 from functools import partial
 
+#Configure broker access
 app = Celery('item ', backend='rpc://', broker='amqp://test:test@192.168.2.244')
 
 """
@@ -27,12 +28,12 @@ Find occurences of words in for every entry text that occurs in our wordList
 def Map(dataset,org,fileName):
     results = []
     with open(fileName,'rU') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter='\t')
-        for row in spamreader:
+        reader = csv.reader(csvfile, delimiter='\t')
+        for row in reader:
             
             arr = []
-            spamreader = csv.reader(row, delimiter=';')
-            for l in spamreader:
+            reader1 = csv.reader(row, delimiter=';')
+            for l in reader1:
                 arr.append(str(l))
             company = (arr[2])[2:-2] #arr[2] is where the post originates from 
             
@@ -46,10 +47,7 @@ def Map(dataset,org,fileName):
             
     return results
 '''
-Group the sublists of (token, 1) pairs into a term-frequency-list
-map, so that the Reduce operation later can work on sorted
-term counts. The returned result is a dictionary with the structure
-{token : [(token, 1), ...] .. }
+Combine tuples with the same key.
 '''
 def Partition(L):
     tf = {}
@@ -62,11 +60,9 @@ def Partition(L):
                 tf[p[0]] = [p]
     return tf
  
-"""
-Given a (token, [(token, 1) ...]) tuple, collapse all the
-count tuples from the Map operation into a single term frequency
-number for this token, and return a final tuple (token, frequency).
-"""
+'''
+Count the number of occurences for each (key,value) tuple
+'''
 def Reduce(Mapping):
   return (Mapping[0], sum(pair[1] for pair in Mapping[1]))
 
@@ -83,26 +79,24 @@ def createWordList(fileName):
 
 @app.task
 def startWorker(item,wordlistPath,orgName):
-    #threads = multiprocessing.cpu_count()
-    #pool = Pool(processes=threads,)
+    #Currently stored local, but could be moved to a cloud environment
     dataset = createWordList(wordlistPath)
     print "Starting map..."
-    single_count_tuples = [Map(dataset,orgName,item)] #pool.map(partial(Map, dataset,orgName),items)
+    single_count_tuples = [Map(dataset,orgName,item)] 
       
     print "Starting Partition..."
   
-    # Organize the count tuples; lists of tuples by token key
+    
     token_to_tuples = Partition(single_count_tuples)
   
     print "Starting Reduce..."
-    # Collapse the lists of tuples into total term frequencies
     
-    term_frequencies = map(Reduce,token_to_tuples.items())#pool.map(Reduce, token_to_tuples.items())
-
+    
+    term_frequencies = map(Reduce,token_to_tuples.items())
     
     print "Sorting list..."
-    # Sort the term frequencies in nonincreasing order
+    
     
     term_frequencies.sort (tuple_sort)
     
-    return term_frequencies
+    return term_frequencies #Send back result to master
