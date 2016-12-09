@@ -54,7 +54,7 @@ def Reduce(Mapping):
 
 if __name__ == '__main__':
     if (len(sys.argv) != 5):
-        print "Usage: python mapred.py [Input directory] [Path to wordlist file] [Name of company to find post from] [Threads utilized by each worker] \nExample: python mapred.py \'Input/\' \'sports\' \'Twitter\' 4"
+        print "Usage: python Master.py [Input directory] [Path to wordlist file] [Name of company to find post from] [Master threads] \nExample: python Master.py \'Input/\' \'sports\' \'Twitter\' 4"
         sys.exit(1)
 
     inDir = sys.argv[1]
@@ -74,8 +74,10 @@ if __name__ == '__main__':
         workers.append(result)
     
     single_count_tuples = []
-    for i in workers:
-        single_count_tuples.append(i.get())
+    while (len(workers) != 0):
+      for task in workers:
+        single_count_tuples.append(task.get())
+        workers.remove(task)
         
     token_to_tuples = Partition(single_count_tuples)
     pool = Pool(processes=procc,)

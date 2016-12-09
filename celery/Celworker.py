@@ -7,7 +7,7 @@ from sets import Set
 from functools import partial
 
 #Configure broker access
-app = Celery('item ', backend='rpc://', broker='amqp://test:test@192.168.2.244')
+app = Celery('item ',backend='rpc://',broker='amqp://test:test@192.168.2.244')
 
 """
 Sort tuples by term frequency, and then alphabetically.
